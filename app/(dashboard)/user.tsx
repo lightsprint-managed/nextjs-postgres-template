@@ -5,7 +5,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
@@ -15,6 +14,14 @@ export async function User() {
   let session = await auth();
   let user = session?.user;
 
+  if (!user) {
+    return (
+      <Button asChild variant="outline" size="sm">
+        <Link href="/login">Sign in</Link>
+      </Button>
+    );
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -23,33 +30,26 @@ export async function User() {
           size="icon"
           className="overflow-hidden rounded-full"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-sm font-medium">
-            {user?.name?.[0]?.toUpperCase() ?? user?.email?.[0]?.toUpperCase() ?? '?'}
+          <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-indigo-400 to-violet-500 text-sm font-medium text-white">
+            {user.name?.[0]?.toUpperCase() ?? user.email?.[0]?.toUpperCase() ?? '?'}
           </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <div className="px-2 py-1.5 text-sm text-muted-foreground">
+          {user.email}
+        </div>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Settings</DropdownMenuItem>
-        <DropdownMenuItem>Support</DropdownMenuItem>
-        <DropdownMenuSeparator />
-        {user ? (
-          <DropdownMenuItem>
-            <form
-              action={async () => {
-                'use server';
-                await signOut();
-              }}
-            >
-              <button type="submit">Sign Out</button>
-            </form>
-          </DropdownMenuItem>
-        ) : (
-          <DropdownMenuItem>
-            <Link href="/login">Sign In</Link>
-          </DropdownMenuItem>
-        )}
+        <DropdownMenuItem>
+          <form
+            action={async () => {
+              'use server';
+              await signOut();
+            }}
+          >
+            <button type="submit">Sign out</button>
+          </form>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

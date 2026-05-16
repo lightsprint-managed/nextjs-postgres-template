@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 
 export default function Error({
   error,
@@ -10,37 +11,26 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service
     console.error(error);
   }, [error]);
 
   return (
-    <main className="p-4 md:p-6">
-      <div className="mb-8 space-y-4">
-        <h1 className="font-semibold text-lg md:text-2xl">
-          Please complete setup
+    <div className="flex min-h-[50vh] flex-col items-center justify-center space-y-6 text-center">
+      <div className="space-y-2">
+        <h1 className="text-2xl font-semibold text-slate-900">
+          Database not connected
         </h1>
-        <p>
-          Inside the Vercel Postgres dashboard, create a table based on the
-          schema defined in this repository.
+        <p className="max-w-md text-sm text-slate-600">
+          Make sure <code className="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs">DATABASE_URL</code> is
+          set in your environment, then run:
         </p>
-        <pre className="my-4 px-3 py-4 bg-black text-white rounded-lg max-w-2xl overflow-scroll flex text-wrap">
-          <code>
-            {`CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
-  email VARCHAR(255) NOT NULL,
-  name VARCHAR(255),
-  username VARCHAR(255)
-);`}
-          </code>
-        </pre>
-        <p>Insert a row for testing:</p>
-        <pre className="my-4 px-3 py-4 bg-black text-white rounded-lg max-w-2xl overflow-scroll flex text-wrap">
-          <code>
-            {`INSERT INTO users (id, email, name, username) VALUES (1, 'me@site.com', 'Me', 'username');`}
-          </code>
-        </pre>
       </div>
-    </main>
+      <pre className="rounded-lg bg-slate-900 px-6 py-4 text-sm text-slate-100">
+        <code>npm run db:setup</code>
+      </pre>
+      <Button onClick={reset} variant="outline" size="sm">
+        Try again
+      </Button>
+    </div>
   );
 }

@@ -59,5 +59,5 @@ pnpm dev
 
 | Variable | Description |
 |----------|-------------|
-| `POSTGRES_URL` | PostgreSQL connection string |
+| `DATABASE_URL` | PostgreSQL connection string |
 | `AUTH_SECRET` | Random secret for signing tokens ([generate one](https://generate-secret.vercel.app/32)) |

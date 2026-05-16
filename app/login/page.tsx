@@ -100,7 +100,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              minLength={8}
+              minLength={isSignUp ? 8 : 1}
             />
             {error && <p className="text-sm text-red-500">{error}</p>}
           </CardContent>

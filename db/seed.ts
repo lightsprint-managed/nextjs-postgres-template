@@ -1,8 +1,9 @@
 import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
-import { products } from '../lib/schema';
-import { count } from 'drizzle-orm';
+import { products, users } from '../lib/schema';
+import { count, eq } from 'drizzle-orm';
+import { hash } from 'bcryptjs';
 
 const SEED_PRODUCTS = [
   {
@@ -26,19 +27,46 @@ async function main() {
     throw new Error('DATABASE_URL is not set');
   }
 
-  const db = drizzle(postgres(process.env.DATABASE_URL));
+  const client = postgres(process.env.DATABASE_URL);
+  const db = drizzle(client);
 
+  // Seed products
   const [{ value }] = await db.select({ value: count() }).from(products);
   if (value > 0) {
     console.log(
       `Skipping seed: products table already has ${value} rows.`
     );
-    return;
+  } else {
+    console.log('Seeding products...');
+    await db.insert(products).values(SEED_PRODUCTS);
+    console.log(`Seeded ${SEED_PRODUCTS.length} products.`);
   }
 
-  console.log('Seeding products...');
-  await db.insert(products).values(SEED_PRODUCTS);
-  console.log(`Seeded ${SEED_PRODUCTS.length} products.`);
+  // Seed admin user (admin@admin.com / password)
+  const passwordHash = await hash('password', 12);
+  const [existingAdmin] = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, 'admin@admin.com'))
+    .limit(1);
+
+  if (existingAdmin) {
+    await db
+      .update(users)
+      .set({ passwordHash, role: 'admin' })
+      .where(eq(users.email, 'admin@admin.com'));
+    console.log('Updated admin user password.');
+  } else {
+    await db.insert(users).values({
+      name: 'Admin',
+      email: 'admin@admin.com',
+      passwordHash,
+      role: 'admin'
+    });
+    console.log('Seeded admin user (admin@admin.com / password).');
+  }
+
+  await client.end();
 }
 
 main().catch((err) => {

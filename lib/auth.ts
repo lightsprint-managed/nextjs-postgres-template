@@ -4,6 +4,20 @@ import { compare } from 'bcryptjs';
 import { db, users } from '@/lib/db';
 import { eq } from 'drizzle-orm';
 
+declare module 'next-auth' {
+  interface User {
+    role?: string;
+  }
+  interface Session {
+    user: {
+      id?: string;
+      name?: string | null;
+      email?: string | null;
+      role?: string;
+    };
+  }
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
     signIn: '/login'
@@ -31,9 +45,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         );
         if (!valid) return null;
 
-        return { id: String(user.id), name: user.name, email: user.email };
+        return {
+          id: String(user.id),
+          name: user.name,
+          email: user.email,
+          role: user.role
+        };
       }
     })
   ],
-  session: { strategy: 'jwt' }
+  session: { strategy: 'jwt' },
+  callbacks: {
+    jwt({ token, user }) {
+      if (user) {
+        token.role = user.role;
+      }
+      return token;
+    },
+    session({ session, token }) {
+      session.user.role = token.role as string | undefined;
+      return session;
+    }
+  }
 });

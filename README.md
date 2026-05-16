@@ -1,36 +1,38 @@
-<div align="center"><strong>Next.js 15 Admin Dashboard Template</strong></div>
-<div align="center">Built with the Next.js App Router</div>
-<br />
-<div align="center">
-<a href="https://next-admin-dash.vercel.app/">Demo</a>
-<span> · </span>
-<a href="https://vercel.com/templates/next.js/admin-dashboard-tailwind-postgres-react-nextjs">Clone & Deploy</a>
-<span>
-</div>
+# Next.js + PostgreSQL Starter
 
-## Overview
+A full-stack Next.js 15 starter with email/password authentication, PostgreSQL, and an admin dashboard.
 
-This is a starter template using the following stack:
+## Stack
 
-- Framework - [Next.js (App Router)](https://nextjs.org)
-- Language - [TypeScript](https://www.typescriptlang.org)
-- Auth - [Auth.js](https://authjs.dev)
-- Database - [Postgres](https://vercel.com/postgres)
-- Deployment - [Vercel](https://vercel.com/docs/concepts/next.js/overview)
-- Styling - [Tailwind CSS](https://tailwindcss.com)
-- Components - [Shadcn UI](https://ui.shadcn.com/)
-- Analytics - [Vercel Analytics](https://vercel.com/analytics)
-- Formatting - [Prettier](https://prettier.io)
-
-This template uses the new Next.js App Router. This includes support for enhanced layouts, colocation of components, tests, and styles, component-level data fetching, and more.
+- **Framework** - [Next.js 15 (App Router)](https://nextjs.org)
+- **Language** - [TypeScript](https://www.typescriptlang.org)
+- **Auth** - [Auth.js](https://authjs.dev) with email/password credentials
+- **Database** - [PostgreSQL](https://www.postgresql.org/) via [Neon](https://neon.tech)
+- **ORM** - [Drizzle](https://orm.drizzle.team)
+- **Styling** - [Tailwind CSS](https://tailwindcss.com)
+- **Components** - [Shadcn UI](https://ui.shadcn.com/)
 
 ## Getting Started
 
-During the deployment, Vercel will prompt you to create a new Postgres database. This will add the necessary environment variables to your project.
+1. Create a PostgreSQL database (e.g. on [Neon](https://neon.tech))
 
-Inside the Vercel Postgres dashboard, create a table based on the schema defined in this repository.
+2. Copy `.env.example` to `.env` and set your values:
+
+```bash
+cp .env.example .env
+```
+
+3. Create the database tables:
 
 ```sql
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100),
+  email VARCHAR(255) NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
 CREATE TYPE status AS ENUM ('active', 'inactive', 'archived');
 
 CREATE TABLE products (
@@ -44,21 +46,18 @@ CREATE TABLE products (
 );
 ```
 
-Then, uncomment `app/api/seed.ts` and hit `http://localhost:3000/api/seed` to seed the database with products.
-
-Next, copy the `.env.example` file to `.env` and update the values. Follow the instructions in the `.env.example` file to set up your GitHub OAuth application.
-
-```bash
-npm i -g vercel
-vercel link
-vercel env pull
-```
-
-Finally, run the following commands to start the development server:
+4. Install dependencies and start the dev server:
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-You should now be able to access the application at http://localhost:3000.
+5. Open http://localhost:3000 and create an account.
+
+## Environment Variables
+
+| Variable | Description |
+|----------|-------------|
+| `POSTGRES_URL` | PostgreSQL connection string |
+| `AUTH_SECRET` | Random secret for signing tokens ([generate one](https://generate-secret.vercel.app/32)) |

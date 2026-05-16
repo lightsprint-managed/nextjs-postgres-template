@@ -9,12 +9,23 @@ import {
   integer,
   timestamp,
   pgEnum,
-  serial
+  serial,
+  varchar
 } from 'drizzle-orm/pg-core';
 import { count, eq, ilike } from 'drizzle-orm';
 import { createInsertSchema } from 'drizzle-zod';
 
 export const db = drizzle(neon(process.env.POSTGRES_URL!));
+
+export const users = pgTable('users', {
+  id: serial('id').primaryKey(),
+  name: varchar('name', { length: 100 }),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  passwordHash: text('password_hash').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull()
+});
+
+export type SelectUser = typeof users.$inferSelect;
 
 export const statusEnum = pgEnum('status', ['active', 'inactive', 'archived']);
 

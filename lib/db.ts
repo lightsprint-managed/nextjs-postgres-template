@@ -1,13 +1,13 @@
 import 'server-only';
 
-import { neon } from '@neondatabase/serverless';
-import { drizzle } from 'drizzle-orm/neon-http';
+import { drizzle } from 'drizzle-orm/postgres-js';
 import { count, eq, ilike } from 'drizzle-orm';
+import postgres from 'postgres';
 import { products, type SelectProduct } from './schema';
 
 export { users, type SelectUser, products, type SelectProduct, statusEnum, insertProductSchema } from './schema';
 
-export const db = drizzle(neon(process.env.DATABASE_URL!));
+export const db = drizzle(postgres(process.env.DATABASE_URL!));
 
 export async function getProducts(
   search: string,

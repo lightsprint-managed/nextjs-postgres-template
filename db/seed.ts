@@ -1,7 +1,8 @@
-import { db, products } from '@/lib/db';
+import 'dotenv/config';
+import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
+import { products } from '../lib/schema';
 import { count } from 'drizzle-orm';
-
-export const dynamic = 'force-dynamic';
 
 const SEED_PRODUCTS = [
   {
@@ -96,17 +97,27 @@ const SEED_PRODUCTS = [
   }
 ];
 
-export async function GET() {
-  const [{ value }] = await db.select({ value: count() }).from(products);
-  if (value > 0) {
-    return Response.json({
-      message: `Products table already has ${value} rows. Skipping seed.`
-    });
+async function main() {
+  if (!process.env.DATABASE_URL) {
+    throw new Error('DATABASE_URL is not set');
   }
 
-  await db.insert(products).values(SEED_PRODUCTS);
+  const db = drizzle(neon(process.env.DATABASE_URL));
 
-  return Response.json({
-    message: `Seeded ${SEED_PRODUCTS.length} products.`
-  });
+  const [{ value }] = await db.select({ value: count() }).from(products);
+  if (value > 0) {
+    console.log(
+      `Skipping seed: products table already has ${value} rows.`
+    );
+    return;
+  }
+
+  console.log('Seeding products...');
+  await db.insert(products).values(SEED_PRODUCTS);
+  console.log(`Seeded ${SEED_PRODUCTS.length} products.`);
 }
+
+main().catch((err) => {
+  console.error('Seed failed:', err);
+  process.exit(1);
+});

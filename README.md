@@ -1,6 +1,6 @@
 # Next.js + PostgreSQL Starter
 
-A full-stack Next.js 15 starter with email/password authentication, PostgreSQL, and an admin dashboard.
+A full-stack Next.js 15 starter with email/password authentication, PostgreSQL via Drizzle ORM, and an admin dashboard.
 
 ## Stack
 
@@ -14,50 +14,60 @@ A full-stack Next.js 15 starter with email/password authentication, PostgreSQL, 
 
 ## Getting Started
 
+### Lightsprint-managed repos
+
+If you created this repo through Lightsprint, `DATABASE_URL` and `AUTH_SECRET` are already configured in your sandbox environment. Run database setup and start developing:
+
+```bash
+npm run db:setup   # Runs migrations + seeds sample data
+npm run dev
+```
+
+### Local development
+
 1. Create a PostgreSQL database (e.g. on [Neon](https://neon.tech))
 
-2. Copy `.env.example` to `.env` and set your values:
+2. Copy `.env.example` to `.env` and fill in your values:
 
 ```bash
 cp .env.example .env
 ```
 
-3. Create the database tables:
-
-```sql
-CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(100),
-  email VARCHAR(255) NOT NULL UNIQUE,
-  password_hash TEXT NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT NOW()
-);
-
-CREATE TYPE status AS ENUM ('active', 'inactive', 'archived');
-
-CREATE TABLE products (
-  id SERIAL PRIMARY KEY,
-  image_url TEXT NOT NULL,
-  name TEXT NOT NULL,
-  status status NOT NULL,
-  price NUMERIC(10, 2) NOT NULL,
-  stock INTEGER NOT NULL,
-  available_at TIMESTAMP NOT NULL
-);
-```
-
-4. Install dependencies and start the dev server:
+3. Install dependencies, set up the database, and start the dev server:
 
 ```bash
-pnpm install
-pnpm dev
+npm install
+npm run db:setup   # Runs migrations + seeds sample data
+npm run dev
 ```
 
-5. Open http://localhost:3000 and create an account.
+4. Open http://localhost:3000 and create an account.
+
+## Scripts
+
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start the dev server (Turbopack) |
+| `npm run build` | Production build |
+| `npm run start` | Run production server |
+| `npm run db:generate` | Generate a new Drizzle migration from schema changes |
+| `npm run db:migrate` | Apply pending migrations |
+| `npm run db:seed` | Seed sample product data (idempotent — skips if data exists) |
+| `npm run db:setup` | Run migrations + seed in one step |
+
+## Database Schema
+
+Schema is defined in `lib/schema.ts` using Drizzle ORM. Migrations live in `drizzle/`.
+
+**Tables:**
+- `users` — email/password accounts
+- `products` — sample product catalog with status, price, stock
+
+To modify the schema, edit `lib/schema.ts` then run `npm run db:generate` to create a migration.
 
 ## Environment Variables
 
 | Variable | Description |
 |----------|-------------|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `AUTH_SECRET` | Random secret for signing tokens ([generate one](https://generate-secret.vercel.app/32)) |
+| `DATABASE_URL` | PostgreSQL connection string. Lightsprint-managed repos get this automatically. |
+| `AUTH_SECRET` | Random secret for signing Auth.js tokens. Lightsprint-managed repos get this automatically. For local dev, [generate one](https://generate-secret.vercel.app/32). |

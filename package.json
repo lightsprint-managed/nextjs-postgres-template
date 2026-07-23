@@ -2,8 +2,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
-    "start": "next start",
+    "//build": "DISABLED in template — a production build overwrites the .next served by the live dev server and takes the preview down. Use `bun run typecheck` to validate. Re-enable for CI/deploys with: next build",
+    "build": "echo 'bun run build is disabled in this template (it breaks the live preview). Use bun run typecheck. See CLAUDE.md.' && exit 1",
+    "//start": "DISABLED in template — production server; the preview runs `bun run dev`. Re-enable for deploys with: next start",
+    "start": "echo 'bun run start is disabled in this template. Use bun run dev. See CLAUDE.md.' && exit 1",
+    "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "npx tsx db/migrate.ts",
     "db:seed": "npx tsx db/seed.ts",

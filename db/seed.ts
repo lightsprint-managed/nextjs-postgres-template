@@ -9,6 +9,7 @@ const SEED_PRODUCTS = [
   {
     name: 'Sample Product',
     status: 'active' as const,
+    imageUrl: 'https://picsum.photos/seed/sample-product/400/400',
     price: '49.00',
     stock: 100,
     availableAt: new Date()
@@ -16,6 +17,7 @@ const SEED_PRODUCTS = [
   {
     name: 'Another Product',
     status: 'active' as const,
+    imageUrl: 'https://picsum.photos/seed/another-product/400/400',
     price: '99.00',
     stock: 50,
     availableAt: new Date()
